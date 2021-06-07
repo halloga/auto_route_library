@@ -41,7 +41,7 @@ Class buildRouterConfig(RouterConfig router, Set<ImportableType> guards,
                   (b) => b
                     ..url = materialImport
                     ..symbol = 'GlobalKey'
-                    ..isNullable = true
+                    ..isNullable = false
                     ..types.add(
                       refer('NavigatorState', materialImport),
                     ),
