@@ -36,7 +36,7 @@ List<Class> buildRouteInfoAndArgs(
                     Parameter((b) => b
                       ..named = true
                       ..name = 'children'
-                      ..defaultTo = Code('[]')
+                      ..defaultTo = Code('const []')
                       ..type = listRefer(pageRouteType, nullable: false)),
                 ])
                 ..initializers.add(refer('super').call([
