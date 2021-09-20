@@ -1,5 +1,4 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:example/data/db.dart';
 import 'package:example/mobile/router/auth_guard.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -29,7 +28,7 @@ class _ProfilePageState extends State<ProfilePage> {
             const SizedBox(height: 32),
             ElevatedButton(
               onPressed: () {
-                context.router.push(MyBooksRoute(filter: 'FromRoute'));
+                context.router.push(MyBooksRoute());
               },
               child: Text('My Books'),
             ),
@@ -44,7 +43,7 @@ class _ProfilePageState extends State<ProfilePage> {
             userData == null
                 ? ElevatedButton(
                     onPressed: () {
-                      context.navigateTo(
+                      context.pushRoute(
                         UserDataCollectorRoute(onResult: (data) {
                           setState(() {
                             userData = data;

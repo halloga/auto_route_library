@@ -3,8 +3,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
-typedef AutoTabsBuilder = Widget Function(
-    BuildContext context, TabsRouter tabsRouter);
+typedef AppBarBuilder = PreferredSizeWidget Function(
+  BuildContext context,
+  TabsRouter tabsRouter,
+);
+
+typedef BottomNavigationBuilder = Widget Function(
+  BuildContext context,
+  TabsRouter tabsRouter,
+);
 
 class AutoTabsScaffold extends StatelessWidget {
   final AnimatedIndexedStackBuilder? builder;
@@ -12,7 +19,7 @@ class AutoTabsScaffold extends StatelessWidget {
   final Duration animationDuration;
   final Curve animationCurve;
   final bool lazyLoad;
-  final AutoTabsBuilder? bottomNavigationBuilder;
+  final BottomNavigationBuilder? bottomNavigationBuilder;
   final NavigatorObserversBuilder navigatorObservers;
   final bool inheritNavigatorObservers;
   final Widget? floatingActionButton;
@@ -35,13 +42,14 @@ class AutoTabsScaffold extends StatelessWidget {
   final String? restorationId;
   final bool extendBody;
   final bool extendBodyBehindAppBar;
-  final AutoTabsBuilder? appBarBuilder;
+  final AppBarBuilder? appBarBuilder;
   final GlobalKey<ScaffoldState>? scaffoldKey;
-
+  final int homeIndex;
   const AutoTabsScaffold({
     Key? key,
     required this.routes,
     this.lazyLoad = true,
+    this.homeIndex = -1,
     this.animationDuration = const Duration(milliseconds: 300),
     this.animationCurve = Curves.ease,
     this.builder,
@@ -79,6 +87,7 @@ class AutoTabsScaffold extends StatelessWidget {
       routes: routes,
       duration: animationDuration,
       lazyLoad: lazyLoad,
+      homeIndex: homeIndex,
       navigatorObservers: navigatorObservers,
       inheritNavigatorObservers: inheritNavigatorObservers,
       curve: animationCurve,
@@ -108,12 +117,9 @@ class AutoTabsScaffold extends StatelessWidget {
           primary: primary,
           appBar: appBarBuilder == null
               ? null
-              : PreferredSize(
-                  child: appBarBuilder!(
-                    context,
-                    tabsRouter,
-                  ),
-                  preferredSize: Size.fromHeight(kToolbarHeight),
+              : appBarBuilder!(
+                  context,
+                  tabsRouter,
                 ),
           body: builder == null
               ? FadeTransition(opacity: animation, child: child)

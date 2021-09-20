@@ -17,6 +17,7 @@ class RouteMatch {
   final Object? args;
   final List<AutoRouteGuard> guards;
   final LocalKey key;
+  final bool isBranch;
 
   const RouteMatch({
     required this.routeName,
@@ -24,6 +25,7 @@ class RouteMatch {
     required this.path,
     required this.stringMatch,
     required this.key,
+    this.isBranch = false,
     this.children,
     this.args,
     this.guards = const [],
@@ -36,6 +38,8 @@ class RouteMatch {
   bool get hasChildren => children?.isNotEmpty == true;
 
   bool get fromRedirect => redirectedFrom != null;
+
+  bool get hasEmptyPath => path == '';
 
   List<String> get allSegments =>
       [...segments, if (hasChildren) ...children!.last.allSegments];
@@ -107,7 +111,7 @@ class RouteMatch {
 
   @override
   String toString() {
-    return 'RouteMatch{routeName: $routeName pathParams: $pathParams, queryParams: $queryParams, children: $children, fragment: $fragment, segments: $segments, redirectedFrom: $redirectedFrom}';
+    return 'RouteMatch{pathParams: $pathParams, queryParams: $queryParams, children: $children, fragment: $fragment, segments: $segments, redirectedFrom: $redirectedFrom, routeName: $routeName, path: $path, stringMatch: $stringMatch, args: $args, guards: $guards, key: $key}';
   }
 
   PageRouteInfo toRoute() => PageRouteInfo.fromMatch(this);

@@ -1,4 +1,29 @@
 # ChangeLog
+##[2.4.0]
+- Fix url updates delay
+- Fix navigate does not update url
+- Add auto_route_information_provider.dart to fix infinite browser back button when using url redirects
+- optimize routes rebuild -> only rebuild if route data changes
+- Change routers are now not ( Watched ) by default to reduce rebuilds [ may Break]
+- Add optional homeIndex property to AutoTabsRouter to make sure we always pop from home tab
+- Change AutoBackButton to use StackRouterScope instead of RouterScope
+##[2.3.2]
+- Merge fix(generator): Bool opt type as num #688
+- Fix nested back gesture issue #686 
+##[2.3.1]
+- Fix navigate to nested routes open last visited nested route #676
+- Add pop parent route support in AutoBackButton
+##[2.3.0]
+- Fix crash when passing non-string values as query params #606
+- Update analyzer version to 2.0.0
+- Update build_runner,build and source_gen versions
+- Merge #616 Export navigation failure
+- Merge #550 Enable AutoTabsScaffold to support custom appbar [Breaking]
+- Update README file
+## [2.2.1] 
+- Fix crash when passing non-string values as query params #606
+- Update analyzer version to 2.0.0
+- Update build_runner,build and source_gen versions
 ## [2.2.0] Breaking changes!
 - Remove helper methods pushToChild and replaceInChild from TabsRouter [Bad idea]. [Breaking]
 - Add navigate and navigateNamed methods to TabsRouter

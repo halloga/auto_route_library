@@ -23,24 +23,42 @@ class DefaultRouteParser extends RouteInformationParser<UrlState> {
   }
 
   @override
-  RouteInformation restoreRouteInformation(UrlState tree) {
-    return RouteInformation(location: tree.url.isEmpty ? '/' : tree.url);
+  RouteInformation restoreRouteInformation(UrlState urlState) {
+    return AutoRouteInformation(
+      location: urlState.url.isEmpty ? '/' : urlState.url,
+      replace: urlState.shouldReplace,
+    );
   }
+}
+
+class AutoRouteInformation extends RouteInformation {
+  final bool replace;
+
+  const AutoRouteInformation({
+    required String location,
+    Object? state,
+    this.replace = true,
+  }) : super(
+          location: location,
+          state: state,
+        );
 }
 
 @immutable
 class UrlState {
   final List<RouteMatch> segments;
   final Uri uri;
+  final bool shouldReplace;
 
-  const UrlState(this.uri, this.segments);
+  const UrlState(this.uri, this.segments, {this.shouldReplace = false});
 
   String get url => uri.toString();
 
   String get path => uri.path;
 
-  factory UrlState.fromSegments(List<RouteMatch> routes) {
-    return UrlState(_buildUri(routes), routes);
+  factory UrlState.fromSegments(List<RouteMatch> routes,
+      {bool shouldReplace = false}) {
+    return UrlState(_buildUri(routes), routes, shouldReplace: shouldReplace);
   }
 
   bool get hasSegments => segments.isNotEmpty;
@@ -75,13 +93,21 @@ class UrlState {
       return Uri(path: fullPath);
     }
     fullPath = p.joinAll(
-      routes.where((e) => e.stringMatch.isNotEmpty).map((e) => e.stringMatch),
+      routes.where((e) => e.stringMatch.isNotEmpty).map(
+            (e) => e.stringMatch,
+          ),
     );
     final normalized = p.normalize(fullPath);
     final lastSegment = routes.last;
-    var queryParams;
+    Map<String, dynamic> queryParams = {};
     if (lastSegment.queryParams.isNotEmpty) {
-      queryParams = lastSegment.queryParams.rawMap;
+      var queries = lastSegment.queryParams.rawMap;
+      for (var key in queries.keys) {
+        var value = queries[key]?.toString() ?? '';
+        if (value.isNotEmpty) {
+          queryParams[key] = value.toString();
+        }
+      }
     }
 
     var fragment;
@@ -90,7 +116,7 @@ class UrlState {
     }
     return Uri(
       path: normalized,
-      queryParameters: queryParams,
+      queryParameters: queryParams.isNotEmpty ? queryParams : null,
       fragment: fragment,
     );
   }
@@ -104,4 +130,16 @@ class UrlState {
 
   @override
   int get hashCode => ListEquality().hash(segments);
+
+  UrlState copyWith({
+    List<RouteMatch>? segments,
+    Uri? uri,
+    bool? replace,
+  }) {
+    return UrlState(
+      uri ?? this.uri,
+      segments ?? this.segments,
+      shouldReplace: replace ?? this.shouldReplace,
+    );
+  }
 }

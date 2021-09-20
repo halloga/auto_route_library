@@ -1,4 +1,5 @@
 import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/type.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:source_gen/source_gen.dart';
 
@@ -10,7 +11,9 @@ import '../models/router_config.dart';
 import '../resolvers/route_parameter_resolver.dart';
 import '../resolvers/type_resolver.dart';
 
-const TypeChecker autoRouteChecker = TypeChecker.fromRuntime(AutoRoute);
+const TypeChecker autoRouteChecker = TypeChecker.fromUrl(
+  'package:auto_route/src/common/auto_route_annotations.dart#AutoRouterAnnotation',
+);
 
 // extracts route configs from class fields and their meta data
 class RouteConfigResolver {
@@ -77,8 +80,11 @@ class RouteConfigResolver {
       guards.add(_typeResolver.resolveType(guard!));
     });
 
-    var returnType = _typeResolver
-        .resolveType(autoRoute.objectValue.type!.typeArguments.first);
+    var returnType = ImportableType(name: 'dynamic');
+    var dartType = autoRoute.objectValue.type;
+    if (dartType is InterfaceType) {
+      returnType = _typeResolver.resolveType(dartType.typeArguments.first);
+    }
 
     int routeType = RouteType.material;
     String? cupertinoNavTitle;

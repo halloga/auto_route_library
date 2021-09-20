@@ -6,11 +6,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-typedef AutoRouteWidgetBuilder = Widget Function(RouteData data);
-
 abstract class AutoRoutePage<T> extends Page<T> {
   final RouteData routeData;
-  final AutoRouteWidgetBuilder builder;
+  final Widget child;
   final bool fullscreenDialog;
   final bool maintainState;
 
@@ -20,11 +18,12 @@ abstract class AutoRoutePage<T> extends Page<T> {
 
   AutoRoutePage({
     required this.routeData,
-    required this.builder,
+    required this.child,
     this.fullscreenDialog = false,
     this.maintainState = true,
     LocalKey? key,
   }) : super(
+          restorationId: 'simple_page',
           name: routeData.name,
           arguments: routeData.route.args,
         );
@@ -38,10 +37,11 @@ abstract class AutoRoutePage<T> extends Page<T> {
   LocalKey get routeKey => routeData.key;
 
   Widget buildPage(BuildContext context) {
-    var childToBuild = builder(routeData);
+    var childToBuild = child;
     if (childToBuild is AutoRouteWrapper) {
       childToBuild = (childToBuild as AutoRouteWrapper).wrappedRoute(context);
     }
+
     return RouteDataScope(
       child: childToBuild,
       segmentsHash: routeData.hashCode,
@@ -63,13 +63,13 @@ abstract class AutoRoutePage<T> extends Page<T> {
 class MaterialPageX<T> extends AutoRoutePage<T> {
   MaterialPageX({
     required RouteData routeData,
-    required AutoRouteWidgetBuilder builder,
+    required Widget child,
     bool fullscreenDialog = false,
     bool maintainState = true,
     LocalKey? key,
   }) : super(
           routeData: routeData,
-          builder: builder,
+          child: child,
           maintainState: maintainState,
           fullscreenDialog: fullscreenDialog,
           key: key,
@@ -107,13 +107,13 @@ abstract class _TitledAutoRoutePage<T> extends AutoRoutePage<T> {
 
   _TitledAutoRoutePage({
     required RouteData routeData,
-    required AutoRouteWidgetBuilder builder,
+    required Widget child,
     this.title,
     bool fullscreenDialog = false,
     bool maintainState = true,
   }) : super(
           routeData: routeData,
-          builder: builder,
+          child: child,
           maintainState: maintainState,
           fullscreenDialog: fullscreenDialog,
         );
@@ -122,13 +122,13 @@ abstract class _TitledAutoRoutePage<T> extends AutoRoutePage<T> {
 class CupertinoPageX<T> extends _TitledAutoRoutePage<T> {
   CupertinoPageX({
     required RouteData routeData,
-    required AutoRouteWidgetBuilder builder,
+    required Widget child,
     String? title,
     bool fullscreenDialog = false,
     bool maintainState = true,
   }) : super(
             routeData: routeData,
-            builder: builder,
+            child: child,
             maintainState: maintainState,
             fullscreenDialog: fullscreenDialog,
             title: title);
@@ -166,13 +166,13 @@ class _PageBasedCupertinoPageRoute<T> extends PageRoute<T>
 class AdaptivePage<T> extends _TitledAutoRoutePage<T> {
   AdaptivePage({
     required RouteData routeData,
-    required AutoRouteWidgetBuilder builder,
+    required Widget child,
     String? title,
     bool fullscreenDialog = false,
     bool maintainState = true,
   }) : super(
           routeData: routeData,
-          builder: builder,
+          child: child,
           title: title,
           maintainState: maintainState,
           fullscreenDialog: fullscreenDialog,
@@ -197,8 +197,8 @@ class AdaptivePage<T> extends _TitledAutoRoutePage<T> {
   }
 }
 
-typedef CustomRouteBuilder<T> = Route<T> Function<T>(
-    BuildContext context, Widget child, CustomPage page);
+typedef CustomRouteBuilder = Route<T> Function<T>(
+    BuildContext context, Widget child, CustomPage<T> page);
 
 class CustomPage<T> extends AutoRoutePage<T> {
   final bool opaque;
@@ -212,7 +212,7 @@ class CustomPage<T> extends AutoRoutePage<T> {
 
   CustomPage({
     required RouteData routeData,
-    required AutoRouteWidgetBuilder builder,
+    required Widget child,
     bool fullscreenDialog = false,
     bool maintainState = true,
     this.opaque = true,
@@ -227,7 +227,7 @@ class CustomPage<T> extends AutoRoutePage<T> {
   }) : super(
           routeData: routeData,
           key: key,
-          builder: builder,
+          child: child,
           maintainState: maintainState,
           fullscreenDialog: fullscreenDialog,
         );
